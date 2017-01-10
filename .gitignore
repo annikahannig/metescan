@@ -1,0 +1,10 @@
+
+*.swo
+*.swp
+
+*.o
+
+*.map
+*.hex
+*.elf
+
