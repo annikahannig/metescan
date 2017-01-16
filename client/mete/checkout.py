@@ -19,6 +19,11 @@ def is_available(account, cart):
 def perform(client, account, cart):
     """Get items from cart, bill to account using client instance"""
     print("[i] Performing checkout for {username}".format(**account))
+    res = None
     for item in cart:
         print("[+]   {name} for {price}".format(**item))
+        res, ok = client.purchase(account, item)
+        if not ok:
+            print("[-] Error performing purchase!")
 
+    return res

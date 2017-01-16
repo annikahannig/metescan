@@ -72,6 +72,7 @@ def app_main(args):
         # Can we do a purchase?
         if checkout.is_available(account, cart):
             result = checkout.perform(client, account, cart)
+            print("[i] All done. New balance: {}".format(result['new_balance']))
             # Print new account stats
             # Reset
             account = None
