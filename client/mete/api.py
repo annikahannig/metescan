@@ -35,6 +35,18 @@ class Client(object):
         return (result_type, obj, res.status_code == 200)
 
 
-    def purchase(account, product):
+    def purchase(self, account, product):
         """Perform purchase, returns updated account"""
-        pass
+        url = "{}/api/users/{}/purchase/".format(self.host, account['id'])
+        payload = {
+            "product": product['id'],
+        }
+
+        # Perform purchase
+        res = requests.post(url, payload, headers={
+            'Authorization': 'Token {}'.format(self.token)
+        })
+
+        return (res.json(), res.status_code == 200)
+
+
