@@ -5,8 +5,8 @@
 #include "lcd.h"
 #include "pcf8574.h"
 
-void LCD_write(uint8_t flags, uint8_t data) {
-
+void LCD_write(uint8_t flags, uint8_t data)
+{
   uint8_t payload = (data<<4) | flags;
 
   // keep backlight on
@@ -40,13 +40,14 @@ void LCD_data(unsigned char data)
 }
 
 
-void LCD_clear() {
+void LCD_clear()
+{
   LCD_command(LCD_CLEAR);
   _delay_ms(15);
 }
 
-void LCD_init() {
-
+void LCD_init()
+{
   // Wait > 40 ms after powerup
   _delay_ms(100);
 
