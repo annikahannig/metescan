@@ -19,8 +19,8 @@
 #include "uart.h"
 #include "lcd.h"
 
-int main(void) {
-
+int main(void)
+{
   // Setup UART
   USART_init();
 

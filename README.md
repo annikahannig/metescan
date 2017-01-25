@@ -1,13 +1,20 @@
 
-MeteScan Client
-===============
+MeteScan
+========
 
-Client interacts with the Mete-API,
+
+This project is divided into two parts:
+* The MeteScan python client
+* The firmware for use with an ATMEGA 328 
+
+
+--
+
+The Client interacts with the Mete-API,
 awaits user input from serial port (keys) and 
 stdin (barcode scanner).
 
 Requires asyncio, python3
-
 
 ## Usage
 

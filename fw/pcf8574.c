@@ -78,7 +78,7 @@ unsigned char PCF8574_read_byte (void)
 }
 
 
-  unsigned char PCF8574_get_inputs(uint8_t address)
+unsigned char PCF8574_get_inputs(uint8_t address)
 {
 	PCF8574_init ();
 	PCF8574_send_start ();
