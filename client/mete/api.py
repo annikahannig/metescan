@@ -7,9 +7,17 @@ RESULT_ACCOUNT = 1
 
 class Client(object):
 
-    def __init__(self, host, token):
+    def __init__(self, host, token, verify=False):
         self.host = host
         self.token = token
+        self.verify = verify
+
+        # Don't do this in production!
+        if not self.host.startswith('https'):
+            print("[WARNING] --------------------------------------------")
+            print("[WARNING] CONNECTING VIA UNSAFE HTTP!")
+            print("[WARNING] F O R  T E S T I N G  P U R P O S E  O N L Y")
+            print("[WARNING] --------------------------------------------")
 
     def is_account(self, obj):
         """Check if response is account"""
@@ -21,7 +29,7 @@ class Client(object):
     def retrieve_barcode(self, barcode):
         """Fetch associated object from server"""
         url = "{}/api/barcode/{}/".format(self.host, barcode)
-        res = requests.get(url, headers={
+        res = requests.get(url, verify=self.verify, headers={
             'Authorization': 'Token {}'.format(self.token)
         })
 
@@ -43,7 +51,7 @@ class Client(object):
         }
 
         # Perform purchase
-        res = requests.post(url, payload, headers={
+        res = requests.post(url, payload, verify=self.verify, headers={
             'Authorization': 'Token {}'.format(self.token)
         })
 

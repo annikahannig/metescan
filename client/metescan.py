@@ -18,6 +18,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='Scantool Params')
     parser.add_argument('-t', '--api-token', required=True)
     parser.add_argument('-m', '--mete-host', required=True)
+    parser.add_argument('-c', '--verify-ca-bundle', default=True)
 
     return parser.parse_args()
 
