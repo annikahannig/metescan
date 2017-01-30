@@ -21,6 +21,7 @@ void USART_init();
 void USART_writeln(const char*);
 void USART_puts(const char*);
 void USART_tx(const unsigned char);
+char* USART_read();
 
 #endif
 

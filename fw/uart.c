@@ -103,8 +103,8 @@ void USART_init()
 
     UCSR0A &= ~(1<<U2X0); // 1x data rate
     UCSR0C = (1<<UCSZ01)|(3<<UCSZ00);
-    /* Enable transmitter only */
-    UCSR0B |= (1<<TXEN0);
+    /* Enable transmitter and receiver */
+    UCSR0B |= (1<<TXEN0) | (1<<RXEN0) | (1<<RXCIE0);
 }
 
 

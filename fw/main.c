@@ -19,8 +19,24 @@
 #include "uart.h"
 #include "lcd.h"
 
+
+#define RX_CMD(buf, x) (strncmp(buf, x, sizeof(x)-1)==0)
+
+/*
+ * Print welcome and version
+ */
+void _cmd_helo()
+{
+  USART_writeln("METESCAN");
+  USART_writeln("VERSION 1.0.0");
+  USART_writeln("READY");
+}
+
+
 int main(void)
 {
+  char *cmd;
+
   // Setup UART
   USART_init();
 
@@ -30,23 +46,36 @@ int main(void)
   // Enable interrupts
   sei();
 
-  USART_writeln("Starting...");
-
   for(;;) {
-    _delay_ms(1000);
-    LCD_set_cursor(0,0);
-    LCD_string("Test123");
-    LCD_set_cursor(0,1);
-    LCD_string("Test223");
-    LCD_set_cursor(0,2);
-    LCD_string("Test323");
-    LCD_set_cursor(0,3);
-    LCD_string("Test423");
+    cmd = USART_read();
+    if (cmd == NULL) {
+      _delay_ms(10);
+      continue;
+    }
 
-    _delay_ms(1000);
-    USART_writeln("cycle...");
+    if RX_CMD(cmd, "HELO") {
+      _cmd_helo();
+    }
+    else if RX_CMD(cmd, "CLR") {
+      LCD_clear();
+    }
+    else if RX_CMD(cmd, "0 ") { // Set row 0
+      LCD_set_cursor(0,0);
+      LCD_string(cmd+2);
+    }
+    else if RX_CMD(cmd, "1 ") { // Set row 1
+      LCD_set_cursor(0,1);
+      LCD_string(cmd+2);
+    }
+    else if RX_CMD(cmd, "2 ") { // Set row 2
+      LCD_set_cursor(0,2);
+      LCD_string(cmd+2);
+    }
+    else if RX_CMD(cmd, "3 ") { // Set row 3
+      LCD_set_cursor(0,3);
+      LCD_string(cmd+2);
+    }
   }
 }
-
 
 
