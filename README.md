@@ -25,6 +25,8 @@ Requires asyncio, python3
 
     --verify-ca-bundle=/path/to/certificate_bundle.pem
 
+    --device=/dev/tty.usbmodem1411
+    --baud-rate=19200
 
 Remember to always use https.
 
