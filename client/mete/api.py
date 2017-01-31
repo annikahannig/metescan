@@ -58,3 +58,8 @@ class Client(object):
         return (res.json(), res.status_code == 200)
 
 
+    def stats(self):
+        """Get some statistics from mete server"""
+        url = "{}/api/stats/".format(self.host)
+        res = requests.get(url)
+        return (res.json(), res.status_code == 200)

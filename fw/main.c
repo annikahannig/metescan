@@ -53,6 +53,8 @@ int main(void)
       continue;
     }
 
+    cli();
+
     if RX_CMD(cmd, "HELO") {
       _cmd_helo();
     }
@@ -75,6 +77,8 @@ int main(void)
       LCD_set_cursor(0,3);
       LCD_string(cmd+2);
     }
+
+    sei();
   }
 }
 

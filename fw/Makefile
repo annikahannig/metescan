@@ -18,7 +18,7 @@ LDFLAGS = -Wl,-u,vfprintf -lprintf_flt
 # OS Detection
 UNAME=$(shell uname)
 ifeq ($(UNAME), Darwin)
-  PROG_PRT=cu.usbmodem1421
+  PROG_PRT=cu.usbmodem1411
 else
   PROG_PRT=ttyUSB1
 endif

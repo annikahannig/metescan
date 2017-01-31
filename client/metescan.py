@@ -5,6 +5,7 @@ import asyncio
 import sys
 
 from mete import api, checkout
+from interface import display, idle
 
 # Input goes here and will be evaluated in the
 # app event loop.
@@ -19,6 +20,8 @@ def parse_arguments():
     parser.add_argument('-t', '--api-token', required=True)
     parser.add_argument('-m', '--mete-host', required=True)
     parser.add_argument('-c', '--verify-ca-bundle', default=True)
+    parser.add_argument('-d', '--device', required=True)
+    parser.add_argument('-b', '--baud-rate', default=19200)
 
     return parser.parse_args()
 
@@ -33,6 +36,7 @@ def input_stdin():
 def input_serial():
     """Read commands from serial (Keys)"""
     print("Read.")
+
 
 
 # Application Main
@@ -50,6 +54,8 @@ def app_main(args):
     client = api.Client(args.mete_host, args.api_token)
 
     while True:
+        idle.enable() # Show screensaver
+
         input_type, input_data = yield from input_queue.get()
         if input_type == INPUT_COMMAND:
             return
@@ -92,6 +98,8 @@ def main():
     loop.add_reader(sys.stdin, input_stdin)
 
     # Start app
+    asyncio.ensure_future(display.display_main(args))
+    asyncio.ensure_future(idle.idle_main(args))
     loop.run_until_complete(app_main(args))
 
 
