@@ -11,6 +11,7 @@ from aflow import dispatchers
 
 # Async services
 from services.scanner import service as scanner_service
+from services.barcode_decoder import service as decoder_service
 from services.store import service as store_service
 
 
@@ -34,12 +35,14 @@ def main():
 
     # Setup Metestore
     store = store_service.Store(args)
+    decoder = decoder_service.BarcodeDecoder(args)
 
     loop = asyncio.get_event_loop()
 
     # Setup application
     dispatcher = dispatchers.ActionDispatcher(debug=True)
     dispatcher.connect(scanner_service.main)
+    dispatcher.connect(decoder.main)
     dispatcher.connect(store.main)
 
     loop.run_forever()
