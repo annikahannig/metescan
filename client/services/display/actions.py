@@ -10,10 +10,11 @@ ADD_LINE = "@display/ADD_LINE"
 CLEAR    = "@display/CLEAR"
 
 
-def set_line(line):
+def set_line(i, line):
     return {
         "type": SET_LINE,
         "payload": {
+            "index": i,
             "line": line,
         },
     }

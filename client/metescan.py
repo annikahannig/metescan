@@ -14,6 +14,8 @@ from services.scanner import service as scanner_service
 from services.barcode_decoder import service as decoder_service
 from services.store import service as store_service
 
+from services.display_emulation import service as display_emu_service
+
 
 def parse_arguments():
     """Get commandline arguments"""
@@ -33,17 +35,21 @@ def main():
     # Get commandline params
     args = parse_arguments()
 
-    # Setup Metestore
+    # Setup Services
     store = store_service.Store(args)
     decoder = decoder_service.BarcodeDecoder(args)
+    display_emulation = display_emu_service.DisplayEmulation("./mete.disp")
 
-    loop = asyncio.get_event_loop()
 
     # Setup application
+    loop = asyncio.get_event_loop()
+
     dispatcher = dispatchers.ActionDispatcher(debug=True)
+
     dispatcher.connect(scanner_service.main)
     dispatcher.connect(decoder.main)
     dispatcher.connect(store.main)
+    dispatcher.connect(display_emulation.main)
 
     loop.run_forever()
 
