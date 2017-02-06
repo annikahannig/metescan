@@ -6,6 +6,7 @@ Handle transactions and main app logic
 
 import asyncio
 
+from services.display import actions as display_actions
 from services.store import actions as store_actions
 from services.barcode_decoder import actions as decoder_actions
 
@@ -33,7 +34,13 @@ class Store(object):
     def add_product(self, product):
         """Handle incoming product"""
         self.cart.append(product)
+
         # Update display
+        padding = 20 - len(product['name']) - 1
+        prod_text = "{0} {1: >{2}}".format(product['name'],
+                                           product['price'],
+                                           padding)
+        self.dispatch(display_actions.add_line(prod_text))
 
         # Can we finish our transaction?
         if checkout.is_available(self.account, self.cart):
@@ -42,7 +49,16 @@ class Store(object):
 
     def set_account(self, account):
         self.account = account
+
         # Update display
+        text = "Hallo {}!".format(account['username'])
+        self.dispatch(display_actions.add_line(text))
+        key = "Konto:"
+        text = "{0} {1: >{2}}".format(key,
+                                     account['account']['balance'],
+                                     20 - len(key) - 1)
+        self.dispatch(display_actions.add_line(text))
+
 
         # Can we finish our transaction?
         if checkout.is_available(self.account, self.cart):
@@ -58,7 +74,20 @@ class Store(object):
                                   self.account,
                                   self.cart)
 
+        # Update display
+        key = "Neu:"
+        text = "{0} {1: >{2}}".format(key,
+                                     result['new_balance'],
+                                     20 - len(key) - 1)
+        self.dispatch(display_actions.add_line(text))
+
+        # Inform all, that the transaction is finished
         self.dispatch(store_actions.checkout_complete(result))
+
+
+    def barcode_error(self):
+        """In case an invalid barcode was supplied"""
+        self.dispatch(display_actions.add_line("Barcode unbekannt"))
 
 
     # Metestore Main
@@ -87,6 +116,8 @@ class Store(object):
                 self.add_product(action['payload']['product'])
             elif action['type'] == decoder_actions.DECODED_ACCOUNT:
                 self.set_account(action['payload']['account'])
+            elif action['type'] == decoder_actions.DECODING_ERROR:
+                self.barcode_error()
             elif action['type'] == store_actions.STORE_CHECKOUT_COMPLETE:
                 self.reset()
 

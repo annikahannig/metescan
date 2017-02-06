@@ -42,13 +42,11 @@ class DisplayEmulation(object):
 
     def _write_buffer(self):
         """Write buffer to file"""
-        screen = [col[:self.cols] for col in [
-            row[-self.rows:] for row in self.buf]]
-
+        screen = [row[:self.cols] for row in self.buf[-self.rows:]]
         with open(self.filename, "w+") as f:
-            f.write("---------------------[Display]-----------------------")
-            f.write("\n\n".join(screen))
-            f.write("-----------------------------------------------------")
+            f.write("-----[Display]------\n")
+            f.write("\n".join(screen))
+            f.write("\n--------------------")
 
 
     @asyncio.coroutine

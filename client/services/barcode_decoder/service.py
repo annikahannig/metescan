@@ -23,6 +23,9 @@ class BarcodeDecoder(object):
 
     def handle_barcode(self, barcode):
         """Process an incomming barcode"""
+        if barcode == "":
+            return # Don't bother
+
         result_type, result, ok = self.client.retrieve_barcode(barcode)
         if not ok:
             self.dispatch(decoder_actions.error_decoding("Unknown Barcode"))
