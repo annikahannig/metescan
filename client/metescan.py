@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 
-import argparse
+"""
+Metescan
+"""
+
 import asyncio
-import sys
+import argparse
 
-from mete import api, checkout
-from interface import display, idle
+from aflow import dispatchers
 
-# Input goes here and will be evaluated in the
-# app event loop.
-INPUT_COMMAND = 0
-INPUT_BARCODE = 1
+# Async services
+from services.scanner import service as scanner_service
+from services.store import service as store_service
 
-input_queue = asyncio.Queue()
 
 def parse_arguments():
     """Get commandline arguments"""
@@ -26,82 +26,27 @@ def parse_arguments():
     return parser.parse_args()
 
 
-# Readers
-def input_stdin():
-    """Read from STDIN (Scanner)"""
-    line = sys.stdin.readline()
-    asyncio.async(input_queue.put((INPUT_BARCODE, line,)))
-
-
-def input_serial():
-    """Read commands from serial (Keys)"""
-    print("Read.")
-
-
-
-# Application Main
-@asyncio.coroutine
-def app_main(args):
-    """
-    Main application loop:
-    Process input, make requests.
-    """
-    # Initialize state
-    account = None
-    cart = []
-
-    # Initialize client
-    client = api.Client(args.mete_host, args.api_token)
-
-    while True:
-        idle.enable() # Show screensaver
-
-        input_type, input_data = yield from input_queue.get()
-        if input_type == INPUT_COMMAND:
-            return
-
-        barcode = input_data
-        print("[i] Fetching: {}".format(barcode))
-
-        result_type, result, ok = client.retrieve_barcode(barcode)
-        if not ok:
-            print("[e] Unknown barcode")
-            continue
-
-        if result_type == api.RESULT_ACCOUNT:
-            account = result
-            print("[+] Hello {username}".format(**account))
-        else:
-            product = result
-            cart.append(result)
-            print("[+] {name} for {price}".format(**product))
-
-        # Can we do a purchase?
-        if checkout.is_available(account, cart):
-            result = checkout.perform(client, account, cart)
-            print("[i] All done. New balance: {}".format(result['new_balance']))
-            # Print new account stats
-            # Reset
-            account = None
-            cart = []
-
-
 def main():
-    """Initialize and start event loop"""
+    """Start scan and checkout"""
 
     # Get commandline params
     args = parse_arguments()
 
+    # Setup Metestore
+    store = store_service.Store(args)
+
     loop = asyncio.get_event_loop()
 
-    # Listen for input 
-    loop.add_reader(sys.stdin, input_stdin)
+    # Setup application
+    dispatcher = dispatchers.ActionDispatcher(debug=True)
+    dispatcher.connect(scanner_service.main)
+    dispatcher.connect(store.main)
 
-    # Start app
-    asyncio.ensure_future(display.display_main(args))
-    asyncio.ensure_future(idle.idle_main(args))
-    loop.run_until_complete(app_main(args))
+    loop.run_forever()
+
 
 
 if __name__ == '__main__':
     main()
+
+
