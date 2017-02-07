@@ -55,7 +55,7 @@ class Store(object):
 
         # Update display
         padding = 20 - len(product['name']) - 1
-        prod_text = "{0} {1: >{2}}".format(product['name'],
+        prod_text = "{0} {1: >{2}}".format(product['name'][:11],
                                            product['price'],
                                            padding)
         self.dispatch(display_actions.add_line(prod_text))

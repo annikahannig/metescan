@@ -15,6 +15,7 @@ from services.barcode_decoder import service as decoder_service
 from services.store import service as store_service
 from services.status_screen import service as status_service
 from services.idle_watchdog import service as idle_service
+from services.display import service as display_service
 
 from services.display_emulation import service as display_emu_service
 
@@ -43,22 +44,23 @@ def main():
     status_screen = status_service.StatusScreen(args)
     watchdog = idle_service.Watchdog(timeout=15)
 
+    display = display_service.SerialDisplay(args.device, args.baud_rate)
     display_emulation = display_emu_service.DisplayEmulation("./mete.disp")
 
     # Setup application
     loop = asyncio.get_event_loop()
 
-    dispatcher = dispatchers.ActionDispatcher(debug=True)
+    dispatcher = dispatchers.ActionDispatcher(debug=False)
 
     dispatcher.connect(scanner_service.main)
     dispatcher.connect(decoder.main)
     dispatcher.connect(store.main)
-    dispatcher.connect(display_emulation.main)
     dispatcher.connect(status_screen.main)
     dispatcher.connect(watchdog.main)
+    dispatcher.connect(display.main)
+    dispatcher.connect(display_emulation.main)
 
     loop.run_forever()
-
 
 
 if __name__ == '__main__':
