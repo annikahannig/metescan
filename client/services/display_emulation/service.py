@@ -30,19 +30,19 @@ class DisplayEmulation(object):
     def _add_line(self, line):
         """Add line to buffer"""
         self.buf.append(line)
+        self.buf = self.buf[-self.rows:] # limit buffer size
         self._write_buffer()
 
 
     def _set_line(self, i, line):
         """Set line relative to view port"""
-        offset = min(0, len(self.buf) - self.rows)
-        self.buf[offset + i] = line
+        self.buf[i] = line
         self._write_buffer()
 
 
     def _write_buffer(self):
         """Write buffer to file"""
-        screen = [row[:self.cols] for row in self.buf[-self.rows:]]
+        screen = [row[:self.cols] for row in self.buf]
         with open(self.filename, "w+") as f:
             f.write("-----[Display]------\n")
             f.write("\n".join(screen))

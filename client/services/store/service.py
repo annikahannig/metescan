@@ -8,7 +8,9 @@ import asyncio
 
 from services.display import actions as display_actions
 from services.store import actions as store_actions
+from services.scanner import actions as scanner_actions
 from services.barcode_decoder import actions as decoder_actions
+from services.idle_watchdog import actions as idle_actions
 
 from mete import api, checkout
 
@@ -24,15 +26,31 @@ class Store(object):
         self.client = api.Client(args.mete_host,
                                  args.api_token)
 
+        self.locked = False
+
 
     def reset(self):
         """Reset store"""
+        self.in_progress = False
+        self.locked = False
         self.account = None
         self.cart = []
 
 
+    def clear_on_first_scan(self):
+        """Clear display, start shopping"""
+        if self.in_progress:
+            return
+
+        self.dispatch(display_actions.clear())
+        self.in_progress = True
+
+
     def add_product(self, product):
         """Handle incoming product"""
+        if self.locked:
+            return
+
         self.cart.append(product)
 
         # Update display
@@ -48,6 +66,10 @@ class Store(object):
 
 
     def set_account(self, account):
+        """Handle incoming account"""
+        if self.locked:
+            return
+
         self.account = account
 
         # Update display
@@ -67,6 +89,7 @@ class Store(object):
 
     def checkout_cart(self):
         """Perform checkout"""
+        self.locked = True # Sleep a bit before next user
         self.dispatch(store_actions.start_checkout(self.account,
                                                    self.cart))
 
@@ -112,14 +135,18 @@ class Store(object):
 
             if action['type'] == store_actions.STORE_RESET:
                 self.reset()
+            elif action['type'] == store_actions.STORE_CHECKOUT_COMPLETE:
+                self.reset()
+            elif action['type'] == idle_actions.IDLE_TIMEOUT:
+                self.reset()
             elif action['type'] == decoder_actions.DECODED_PRODUCT:
                 self.add_product(action['payload']['product'])
             elif action['type'] == decoder_actions.DECODED_ACCOUNT:
                 self.set_account(action['payload']['account'])
             elif action['type'] == decoder_actions.DECODING_ERROR:
                 self.barcode_error()
-            elif action['type'] == store_actions.STORE_CHECKOUT_COMPLETE:
-                self.reset()
+            elif action['type'] == scanner_actions.INPUT_BARCODE:
+                self.clear_on_first_scan()
 
 
 

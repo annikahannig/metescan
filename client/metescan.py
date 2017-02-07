@@ -13,6 +13,8 @@ from aflow import dispatchers
 from services.scanner import service as scanner_service
 from services.barcode_decoder import service as decoder_service
 from services.store import service as store_service
+from services.status_screen import service as status_service
+from services.idle_watchdog import service as idle_service
 
 from services.display_emulation import service as display_emu_service
 
@@ -38,8 +40,10 @@ def main():
     # Setup Services
     store = store_service.Store(args)
     decoder = decoder_service.BarcodeDecoder(args)
-    display_emulation = display_emu_service.DisplayEmulation("./mete.disp")
+    status_screen = status_service.StatusScreen(args)
+    watchdog = idle_service.Watchdog(timeout=15)
 
+    display_emulation = display_emu_service.DisplayEmulation("./mete.disp")
 
     # Setup application
     loop = asyncio.get_event_loop()
@@ -50,6 +54,8 @@ def main():
     dispatcher.connect(decoder.main)
     dispatcher.connect(store.main)
     dispatcher.connect(display_emulation.main)
+    dispatcher.connect(status_screen.main)
+    dispatcher.connect(watchdog.main)
 
     loop.run_forever()
 
