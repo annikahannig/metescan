@@ -22,6 +22,50 @@
 
 #define RX_CMD(buf, x) (strncmp(buf, x, sizeof(x)-1)==0)
 
+#define BT_PORT PORTB
+#define BT_PIN  PINB
+#define BT_DDR  DDRB
+
+#define BT_CANCEL (1<<PB0)
+#define BT_CANCEL_MSK (1<<PCIE0)
+#define BT_CANCEL_INT (1<<PCINT0)
+
+
+/*
+ * Input handler
+ */
+void INPUT_init()
+{
+  BT_DDR &= ~BT_CANCEL; // use as input
+  BT_PORT &= ~BT_CANCEL; // no internal pullups
+
+  // setup interrupt registers
+  PCICR |= BT_CANCEL_MSK; // enable PCMSK0 (PCINT0)
+  PCMSK0 |= BT_CANCEL_INT;
+
+  // setup timer
+  TCCR1A = 0x00;
+  TCCR1B = (1<<CS12) | (1<<CS10); // Prescaler: 1024
+
+}
+
+// Input interrupt handler
+ISR(PCINT0_vect)
+{
+  if (BT_PIN & BT_CANCEL) { // BT UP
+    int pulse_length = TCNT1;
+    if (pulse_length > 60) {
+      USART_writeln("BT_CANCEL_UP");
+    }
+  }
+  else {
+    TCNT1=0; // reset timer
+  }
+}
+
+
+
+
 /*
  * Print welcome and version
  */
@@ -36,6 +80,9 @@ void _cmd_helo()
 int main(void)
 {
   char *cmd;
+
+  // Setup button input
+  INPUT_init();
 
   // Setup UART
   USART_init();
