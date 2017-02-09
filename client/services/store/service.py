@@ -137,6 +137,8 @@ class Store(object):
                 self.reset()
             elif action['type'] == store_actions.STORE_CHECKOUT_COMPLETE:
                 self.reset()
+            elif action['type'] == display_actions.BUTTON_CANCEL_PRESSED:
+                self.reset()
             elif action['type'] == idle_actions.IDLE_TIMEOUT:
                 self.reset()
             elif action['type'] == decoder_actions.DECODED_PRODUCT:

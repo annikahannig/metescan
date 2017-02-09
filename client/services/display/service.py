@@ -30,6 +30,10 @@ class SerialDisplay(object):
         self.buf = [" " * self.cols for _ in range(self.rows)]
         self.diff_buf = copy(self.buf)
 
+        self.dispatch = False
+
+        loop = asyncio.get_event_loop()
+        loop.add_reader(self.serial, self._read_serial_input)
 
     def _clear(self):
         """Clear screen"""
@@ -46,6 +50,20 @@ class SerialDisplay(object):
         """Set line on display"""
         self.buf[i] = line
 
+
+    def _read_serial_input(self):
+        """Async reader from serial"""
+        if not self.dispatch:
+            return
+
+        line = ""
+        res = ""
+        while res != '\n' and res != '\r':
+           res = self.serial.read().decode()
+           line += res
+        line = line.strip()
+        if line == 'BT_CANCEL_UP':
+            self.dispatch(display_actions.button_cancel_pressed())
 
 
     async def _write_buffer(self):
@@ -78,6 +96,8 @@ class SerialDisplay(object):
     @asyncio.coroutine
     def main(self, dispatch, queue):
         """Serial communication service"""
+        self.dispatch = dispatch
+
         # Wait after powerup
         yield from asyncio.sleep(1)
 

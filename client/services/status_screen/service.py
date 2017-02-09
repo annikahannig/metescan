@@ -91,6 +91,8 @@ class StatusScreen(object):
                 self.enabled = False
             elif action['type'] == idle_actions.IDLE_TIMEOUT:
                 self.enabled = True
+            elif action['type'] == display_actions.BUTTON_CANCEL_PRESSED:
+                self.enabled = True
             elif action['type'] == store_actions.STORE_CHECKOUT_COMPLETE:
                 asyncio.ensure_future(self._fetch_stats())
 
