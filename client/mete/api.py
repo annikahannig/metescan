@@ -1,9 +1,9 @@
 import requests
 
 # Constants
+RESULT_ERROR = -1
 RESULT_BARCODE = 0
 RESULT_ACCOUNT = 1
-
 
 class Client(object):
 
@@ -33,7 +33,10 @@ class Client(object):
             'Authorization': 'Token {}'.format(self.token)
         })
 
-        obj = res.json()
+        try:
+            obj = res.json()
+        except:
+            return (RESULT_ERROR, None, False)
 
         # Check object associated to barcode
         result_type = RESULT_BARCODE
@@ -55,11 +58,23 @@ class Client(object):
             'Authorization': 'Token {}'.format(self.token)
         })
 
-        return (res.json(), res.status_code == 200)
+        try:
+            result = (res.json(), res.status_code == 200)
+        except:
+            result = (None, False)
+
+        return result
 
 
     def stats(self):
         """Get some statistics from mete server"""
         url = "{}/api/stats/".format(self.host)
         res = requests.get(url)
-        return (res.json(), res.status_code == 200)
+
+        try:
+            result = (res.json(), res.status_code == 200)
+        except:
+            result = (None, False)
+
+        return result
+
