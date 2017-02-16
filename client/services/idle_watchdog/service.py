@@ -15,10 +15,11 @@ class Watchdog(object):
         self.time = 0
 
 
-    async def _run_timer(self):
+    @asyncio.coroutine
+    def _run_timer(self):
         """Run async timer"""
         while True:
-            await asyncio.sleep(1)
+            yield from asyncio.sleep(1)
             self.time += 1
 
             if self.time >= self.timeout:

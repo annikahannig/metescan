@@ -65,8 +65,8 @@ class SerialDisplay(object):
         if line == 'BT_CANCEL_UP':
             self.dispatch(display_actions.button_cancel_pressed())
 
-
-    async def _write_buffer(self):
+    @asyncio.coroutine
+    def _write_buffer(self):
         """Write buffer to serial display"""
         diff = []
         screen = [row[:self.cols] for row in self.buf]
@@ -81,16 +81,16 @@ class SerialDisplay(object):
             data = "{} {}\n".format(row, update)
             # padup data to clear line
             self.serial.write(bytes(data, 'utf8'))
-            await asyncio.sleep(0.05)
+            yield from asyncio.sleep(0.05)
 
         self.diff_buf = screen
 
-
-    async def _update_display(self):
+    @asyncio.coroutine
+    def _update_display(self):
         """Update display loop"""
         while True:
-            await self._write_buffer()
-            await asyncio.sleep(0.1)
+            yield from self._write_buffer()
+            yield from asyncio.sleep(0.1)
 
 
     @asyncio.coroutine

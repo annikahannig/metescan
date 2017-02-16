@@ -25,26 +25,28 @@ class StatusScreen(object):
         self.stats = None
 
 
-    async def _fetch_stats(self):
+    @asyncio.coroutine
+    def _fetch_stats(self):
         """Fetch stats from server"""
         loop = asyncio.get_event_loop()
         future = loop.run_in_executor(None, self.client.stats)
-        await future
+        yield from future
         self.stats, ok = future.result()
 
-
-    async def _update_stats(self):
+    @asyncio.coroutine
+    def _update_stats(self):
         """Update statistics periodically"""
         while True:
-            await self._fetch_stats()
-            await asyncio.sleep(30)
+            yield from self._fetch_stats()
+            yield from asyncio.sleep(30)
 
 
-    async def _display_stats(self):
+    @asyncio.coroutine
+    def _display_stats(self):
         """Async display loop"""
         while True:
             if not self.enabled:
-                await asyncio.sleep(0.2)
+                yield from asyncio.sleep(0.2)
                 continue
 
             # Update Display with info
@@ -73,7 +75,7 @@ class StatusScreen(object):
                 self.dispatch(display_actions.set_line(i, line))
 
             # Wait
-            await asyncio.sleep(1)
+            yield from asyncio.sleep(1)
 
 
     @asyncio.coroutine
