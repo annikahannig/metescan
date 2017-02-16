@@ -24,7 +24,7 @@ class ActionDispatcher(object):
         queue = asyncio.Queue()
 
         # Execute observer on event loop
-        asyncio.ensure_future(observer(self.dispatch, queue))
+        asyncio.async(observer(self.dispatch, queue))
         self.queues.append(queue)
 
     def dispatch(self, action):
