@@ -84,8 +84,8 @@ class StatusScreen(object):
 
         self.dispatch = dispatch
 
-        asyncio.ensure_future(self._display_stats())
-        asyncio.ensure_future(self._update_stats())
+        asyncio.async(self._display_stats())
+        asyncio.async(self._update_stats())
 
         while True:
             action = yield from queue.get()
@@ -96,5 +96,5 @@ class StatusScreen(object):
             elif action['type'] == display_actions.BUTTON_CANCEL_PRESSED:
                 self.enabled = True
             elif action['type'] == store_actions.STORE_CHECKOUT_COMPLETE:
-                asyncio.ensure_future(self._fetch_stats())
+                asyncio.async(self._fetch_stats())
 

@@ -35,7 +35,7 @@ class Watchdog(object):
         dispatch idle timeout action
         """
         self.dispatch = dispatch # i'll need to fix this
-        asyncio.ensure_future(self._run_timer())
+        asyncio.async(self._run_timer())
 
         while True:
             action = yield from queue.get()

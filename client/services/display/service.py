@@ -102,7 +102,7 @@ class SerialDisplay(object):
         yield from asyncio.sleep(1)
 
         # Update screen
-        asyncio.ensure_future(self._update_display())
+        asyncio.async(self._update_display())
 
         while True:
             action = yield from queue.get()
