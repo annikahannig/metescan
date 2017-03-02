@@ -16,10 +16,10 @@ from services.idle_watchdog import actions as idle_actions
 class StatusScreen(object):
     """Show some mete stats"""
 
-    def __init__(self, args):
+    def __init__(self, client, args):
         """Initialize status screen"""
         self.args = args
-        self.client = api.Client(args.mete_host, args.api_token)
+        self.client = client
 
         self.enabled = True # Initial state
         self.stats = None

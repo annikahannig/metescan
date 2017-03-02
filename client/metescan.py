@@ -9,6 +9,8 @@ import argparse
 
 from aflow import dispatchers
 
+from mete import api
+
 # Async services
 from services.scanner import service as scanner_service
 from services.barcode_decoder import service as decoder_service
@@ -38,10 +40,15 @@ def main():
     # Get commandline params
     args = parse_arguments()
 
+    # Initialize client
+    client = api.Client(args.mete_host,
+                        verify=args.verify_ca_bundle,
+                        token=args.api_token)
+
     # Setup Services
-    store = store_service.Store(args)
-    decoder = decoder_service.BarcodeDecoder(args)
-    status_screen = status_service.StatusScreen(args)
+    store = store_service.Store(client, args)
+    decoder = decoder_service.BarcodeDecoder(client, args)
+    status_screen = status_service.StatusScreen(client, args)
     watchdog = idle_service.Watchdog(timeout=15)
 
     display = display_service.SerialDisplay(args.device, args.baud_rate)

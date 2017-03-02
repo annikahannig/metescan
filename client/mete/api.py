@@ -69,7 +69,7 @@ class Client(object):
     def stats(self):
         """Get some statistics from mete server"""
         url = "{}/api/stats/".format(self.host)
-        res = requests.get(url)
+        res = requests.get(url, verify=self.verify)
 
         try:
             result = (res.json(), res.status_code == 200)

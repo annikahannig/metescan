@@ -12,13 +12,12 @@ from mete import api
 class BarcodeDecoder(object):
     """Decode incoming barcodes, emits products and accounts"""
 
-    def __init__(self, args):
+    def __init__(self, client, args):
         """Initialize decoder"""
         self.args = args
 
         # Initialize client
-        self.client = api.Client(args.mete_host,
-                                 args.api_token)
+        self.client = client
 
 
     def handle_barcode(self, barcode):

@@ -17,14 +17,13 @@ from mete import api, checkout
 class Store(object):
     """Metestore"""
 
-    def __init__(self, args):
+    def __init__(self, client, args):
         """Setup store, get settings from args"""
         self.args = args
         self.reset()
 
         # Initialize client
-        self.client = api.Client(args.mete_host,
-                                 args.api_token)
+        self.client = client
 
         self.locked = False
 
@@ -124,10 +123,6 @@ class Store(object):
         # Initialize state
         account = None
         cart = []
-
-        # Initialize client
-        client = api.Client(self.args.mete_host,
-                            self.args.api_token)
 
         # Main event loop
         while True:
