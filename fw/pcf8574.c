@@ -1,4 +1,4 @@
-#include "PCF8574.h"
+#include "pcf8574.h"
 
 /*
  * Original sourcecode from:
